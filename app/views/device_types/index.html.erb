@@ -1,0 +1,29 @@
+<p id="notice"><%= notice %></p>
+
+<h1><%=(t "device_types.index.title")%></h1>
+
+<table id="device_types" class="dataTableJS table table-striped">
+  <thead>
+    <tr>
+      <th><%=(t "mixed_fields.name")%></th>
+      <th><%=(t "mixed_fields.info")%></th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @device_types.each do |device_type| %>
+      <tr>
+        <td><%= device_type.name %></td>
+        <td><%= device_type.info %></td>
+        <td width="260px"><%= link_to (t "buttons.show"), device_type, class: 'btn btn-info' %>
+        <%= link_to (t "buttons.edit"), edit_device_type_path(device_type), class: 'btn btn-warning' %>
+        <%= link_to (t "buttons.destroy"), device_type, method: :delete, data: { confirm: (t 'buttons.confirmation_sure_message') }, class: 'btn btn-danger' %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to (t "buttons.new.device_types"), new_device_type_path, class: 'btn btn-success' %>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>IMS - Inventory Management System</title>
+  <%= stylesheet_link_tag    'application', media: 'all' %>
+
+  <%= javascript_include_tag 'application' %>
+  <%= csrf_meta_tags %>
+  <%= include_gon %>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+  <link rel="icon" type="image/png" href="../ims_logo.png">
+
+</head>
+<body>
+
+<%= stylesheet_link_tag "starts" %>
+
+
+<script type="text/javascript">
+    function updateTime() {
+        var date = new Date();
+        var hours = date.getHours();
+        var minutes = date.getMinutes();
+        var day = date.getDate();
+        var monthOfTheYear = date.getMonth();
+        var year = date.getFullYear();
+        var dayInWeek = date.getDay();
+        var year_t = date.getFullYear() - 2000;
+        var weekday;
+        var month;
+        var resultDate;
+        var month_t = new Array("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec");
+
+        if (<%=I18n.locale.to_s == "de"%>) {
+            weekday = new Array("Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag")
+            month = new Array("Januar", "Februar", "M&auml;rz", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember")
+        }else{
+            weekday = new Array("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")
+            month = new Array("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
+        }
+
+        if (hours < 10) {
+            hours = "0" + hours;
+        }
+        if (minutes < 10) {
+            minutes = "0" + minutes;
+        }
+        if (day < 10) {
+            day = "0" + day;
+        }
+
+        if (<%=I18n.locale.to_s == "de"%>) {
+            resultDate = weekday[dayInWeek] + ", " + day + ". " + month[monthOfTheYear] + " " + year + " " + hours + ":" + minutes;
+        } else {
+            if(day == 1 || day == 21 || day == 31) {
+                resultDate = weekday[dayInWeek] + ", the " + + day + "st of " + month[monthOfTheYear] + " " + year + " " + hours + ":" + minutes;
+            } else if(day == 2 || day == 22){
+                resultDate = weekday[dayInWeek] + ", the " + + day + "nd of " + month[monthOfTheYear] + " " + year + " " + hours + ":" + minutes;
+            } else if(day == 3 || day == 23){
+                resultDate = weekday[dayInWeek] + ", the " + + day + "rd of " + month[monthOfTheYear] + " " + year + " " + hours + ":" + minutes;
+            } else{
+                resultDate = weekday[dayInWeek] + ", the " + + day + "th of " + month[monthOfTheYear] + " " + year + " " + hours + ":" + minutes;
+            }
+        }
+
+        document.getElementById('time').innerHTML = resultDate;
+        var date_t = day + "" + hours + "" + minutes + "" + month_t[monthOfTheYear] + "" + year_t;
+
+        <!--document.getElementById('time').innerHTML = datum;-->
+        document.getElementById('time1').innerHTML = date_t;
+        setTimeout(updateTime, 60000);
+    }
+
+
+
+    window.addEventListener("load", updateTime);
+
+
+</script>
+
+<!-- class="hidden-xs hidden-sm"-->
+<div>
+
+<div id="banner" >
+  <div id="logo" onclick="javascript:window.location.href='/starts/';"></div>
+    <div id="language">
+      <% if BossConfig.first.db_state == false %>
+          <button type="button" class="btn btn-danger" disabled="disabled">Im Einsatz</button>
+      <% end %>
+    <input id="switch"  type="checkbox" data-cur_lang="<%= I18n.locale %>" <% if I18n.locale == :en %>checked<% end %> />
+    </div>
+
+<div id="infobar">
+    <ul class="nav nav-tabs" >
+      <% if current_user %>
+      <% if (current_user.right.manage_device_types == true) || (current_user.right.manage_stocks_and_units == true)%>
+      <li role="presentation" class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+          Administration <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+          <% if (current_user.right.manage_device_types == true) %>
+          <li role="presentation"><a href="/device_types/"><%= t "devices.device_type" %></a></li>
+          <li role="presentation"><a href="/properties/"><%= t "properties.propertie" %></a></li>
+          <% end %>
+          <% if (current_user.right.manage_stocks_and_units == true)%>
+          <li role="presentation"><a href="/units/"><%= t "buttons.main_menu.units" %></a></li>
+          <li role="presentation"><a href="/stocks/"><%= t "buttons.main_menu.stocks" %></a></li>
+          <% end %>
+          <% if (current_user.right.manage_boss == true)%>
+              <li role="presentation"><a href="/boss_configs/<%= @Boss = BossConfig.first.id%>/edit">Config</a></li>
+          <% end %>
+        </ul>
+      </li>
+      <% end %>
+      <% end %>
+      <li role="presentation"><a href="/impressum/">Impressum</a></li>
+      <li role="presentation"><a href= "/contacts/"><%=t "buttons.main_menu.contact" %></a></li>
+      <% if logged_in? %><li role="presentation"><a href="/logout/"><b><%= current_user.username %></b> (Logout)</a></li><% end %>
+    </ul>
+</div>
+  <div style="clear:both"></div>
+
+
+
+</div>
+
+
+<div id="timebox">
+
+    <div id="time">
+    </div>
+    <div id="time1">
+    </div>
+</div>
+<div id="bgcontainer">
+  <% if(flash[:success])%>
+      <div class="alert alert-success alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <%= flash[:success] %>
+      </div>
+  <% end %>
+  <% if(flash[:notice])%>
+      <div class="alert alert-info alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <%= flash[:notice] %>
+      </div>
+  <% end %>
+  <% if(flash[:warning])%>
+      <div class="alert alert-warning alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <%= flash[:warning] %>
+      </div>
+  <% end %>
+  <% if(flash[:error])%>
+      <div class="alert alert-danger alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <%= flash[:error] %>
+      </div>
+  <% end %>
+
+
+
+
+<div class="nav-stacked" id="menucontainer">
+
+  <% if logged_in? %>
+  <ul class="nav nav-pills nav-stacked ">
+    <li role="presentation" class="<%= 'active'if params[:controller] == 'starts' %> " ><a href="/starts/" >Start</a></li>
+    <li role="presentation" class="<%= 'active'if params[:controller] == 'operations' %> "><a href="/operations/" ><%= t "buttons.main_menu.operations" %></a></li>
+    <li role="presentation" class="<%= 'active'if params[:controller] == 'devices' %> "><a href="/devices/" ><%= t "buttons.main_menu.devices" %></a></li>
+    <li role="presentation" class="<%= 'active'if params[:controller] == 'users' %> "><a href="/users/" ><%= t "buttons.main_menu.users" %></a></li>
+    <li role="presentation" class="<%= 'active'if params[:controller] == 'lendings' %> "><a href="/lendings/" ><%= t "buttons.main_menu.lendings" %></a></li>
+
+  </ul>
+
+  <% end %>
+
+  <% if !logged_in? %>
+      <ul class="nav nav-pills nav-stacked">
+        <li role="presentation" class="<%= 'active'if params[:controller] == 'starts' %> " ><a href="/login/" >Start</a></li>
+        <li role="presentation" class="<%= 'inactive'if params[:controller] == 'operations' %> "><a href="/login/" ><%= t "buttons.main_menu.operations" %></a></li>
+        <li role="presentation" class="<%= 'inactive'if params[:controller] == 'devices' %> "><a href="/login/" ><%= t "buttons.main_menu.devices" %></a></li>
+        <li role="presentation" class="<%= 'inactive'if params[:controller] == 'users' %> "><a href="/login/" ><%= t "buttons.main_menu.users" %></a></li>
+        <li role="presentation" class="<%= 'inactive'if params[:controller] == 'landings' %>"><a href="/lendings/" ><%= t "buttons.main_menu.lendings" %></a></li>
+  </ul>
+  <% end %>
+</div>
+
+
+
+
+<div id="content">
+    <%= yield %>
+</div>
+
+
+
+</div>
+
+</div>
+
+
+
+
+
+</body>
+</html>

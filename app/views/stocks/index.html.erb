@@ -1,0 +1,35 @@
+<p id="notice"><%= notice %></p>
+
+<h1><%= t "stocks.index.title" %></h1>
+
+<table id="stocks" class="dataTableJS table table-striped">
+  <thead>
+    <tr>
+      <th><%= t "mixed_fields.name" %></th>
+      <th><%= t "mixed_fields.info" %></th>
+      <th><%= t "mixed_fields.unit" %></th>
+      <th><%= t "stocks.city" %></th>
+      <th><%= t "stocks.street" %></th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @stocks.each do |stock| %>
+      <tr>
+        <td><%= stock.name %></td>
+        <td><%= stock.info %></td>
+        <td><% unless stock.unit.nil?%>  <%= stock.unit.name %> <%end%> </td>
+        <td><%= stock.city %></td>
+        <td><%= stock.street %></td>
+        <td width="260px"><%= link_to (t "buttons.show"), stock, class: 'btn btn-info' %>
+          <%if current_user.right.manage_stocks_and_units==true%> <%= link_to (t "buttons.edit"), edit_stock_path(stock), class: 'btn btn-warning' %> <%end%>
+          <%if current_user.right.manage_stocks_and_units==true%>  <%= link_to (t "buttons.destroy"), stock, method: :delete, data: { confirm: (t 'buttons.confirmation_sure_message') }, class: 'btn btn-danger' %></td><%end%>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+          <%if current_user.right.manage_stocks_and_units==true%><%= link_to (t "buttons.new.stock"), new_stock_path, class: 'btn btn-success' %><%end%>
